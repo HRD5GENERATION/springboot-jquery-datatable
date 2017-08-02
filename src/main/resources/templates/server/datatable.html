@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>DataTable Demo</title>
+	
+	<!--Datatable  -->
+	<!-- <link rel="stylesheet" href="https://cdn.datatables.net/1.10.15/css/jquery.dataTables.min.css"/> -->
+	
+	<!--Semantic  -->
+	
+	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/semantic-ui/2.2.6/semantic.min.css"/>
+	<link rel="stylesheet" href="https://cdn.datatables.net/1.10.15/css/dataTables.semanticui.min.css"/>
+	
+	<!--Bootstrap --> 
+    <!-- <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css"/>
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.10.15/css/dataTables.bootstrap.min.css"/> -->
+	<style>
+		.ui.selection.dropdown {
+		    min-height: 1em !important; 
+		}
+	</style>
+</head>
+<body>
+	<!-- <table id="example" class="table table-striped table-bordered" cellspacing="0" width="100%"> -->
+	<table id="example" class="ui celled table" cellspacing="0" width="100%">
+        <thead>
+            <tr>
+                <th>First name</th>
+                <th>Last name</th>
+                <th>Position</th>
+                <th>Office</th>
+                <th>Start date</th>
+                <th>Salary</th>
+            </tr>
+        </thead>
+        <tfoot>
+            <tr>
+                <th>First name</th>
+                <th>Last name</th>
+                <th>Position</th>
+                <th>Office</th>
+                <th>Start date</th>
+                <th>Salary</th>
+            </tr>
+        </tfoot>
+    </table>
+    <script type="text/javascript" src="https://code.jquery.com/jquery-1.12.4.js"></script>
+    <script type="text/javascript" src="https://cdn.datatables.net/1.10.15/js/jquery.dataTables.min.js"></script>
+    
+    <!--Semantic --> 
+    
+    <script type="text/javascript" src="https://cdn.datatables.net/1.10.15/js/dataTables.semanticui.min.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/semantic-ui/2.2.6/semantic.min.js"></script> 
+   
+    
+    <!--Bootstrap  -->
+	<!-- <script src="https://cdn.datatables.net/1.10.15/js/jquery.dataTables.min.js"></script>
+	<script src="https://cdn.datatables.net/1.10.15/js/dataTables.bootstrap.min.js"></script> -->
+    
+
+    <script type="text/javascript">
+	    $(document).ready(function() {
+	    	
+	        var table = $('#example').DataTable( {
+	            "processing": true,
+	            "serverSide": true,
+	            "pagingType": "full_numbers",
+	            "ajax": "http://localhost:8080/ajax/datatable",
+	            "columns": [
+     		            { "data": "firstname" },
+     		            { "data": "lastname" },
+     		            { "data": "position" },
+     		            { "data": "office" },
+     		            { "data": "date" },
+     		            { "data": "salary" }
+     		    ],
+     		    "initComplete": function () {
+     		            this.api().columns().every( function () {
+     		                var column = this;
+     		                var select = $('<select class="ui dropdown"><option value="">No Filter</option></select>')
+     		                    .appendTo( $(column.footer()).empty() )
+     		                    .on( 'change', function () {
+     		                        var val = $.fn.dataTable.util.escapeRegex(
+     		                            $(this).val()
+     		                        );
+     		                        column.search( val ? '^'+val+'$' : '', true, false ).draw();
+     		                    } );
+     		 
+     		                column.data().unique().sort().each( function ( d, j ) {
+     		                    select.append( '<option value="'+d+'">'+d+'</option>' )
+     		                } );
+     		            } );
+     		            $('.ui.dropdown').dropdown();
+     		        }
+	        } );
+	        
+	        /*
+	        //TODO: Search Block
+	    	// Setup - add a text input to each footer cell
+	        $('#example tfoot th').each( function () {
+	            var title = $(this).text();
+	            $(this).html( '<div class="ui input"><input class="ui input" type="text" placeholder="Search '+title+'" /></div>' );
+	        } );
+	     
+	   	  	// Apply the search
+	        table.columns().every( function () {
+	            var self = this;
+	            $( 'input', this.footer() ).on( 'keyup change', function () {
+	                if ( self.search() !== this.value ) {
+	                	self.search( this.value ).draw();
+	                }
+	            } );
+	        } );
+	   	  	//TODO: End Search Block
+	   	  	*/
+	    } );
+    </script>
+
+    
+</body>
+</html>
