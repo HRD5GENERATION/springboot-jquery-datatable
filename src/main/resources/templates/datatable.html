@@ -19,10 +19,11 @@
 		    min-height: 1em !important; 
 		}
 	</style>
+	
 </head>
 <body>
 	<!-- <table id="example" class="table table-striped table-bordered" cellspacing="0" width="100%"> -->
-	<table id="example" class="ui celled table" cellspacing="0" width="100%">
+	<table id="example" class="ui celled table">
         <thead>
             <tr>
                 <th>First name</th>
@@ -44,14 +45,13 @@
             </tr>
         </tfoot>
     </table>
+    
     <script type="text/javascript" src="https://code.jquery.com/jquery-1.12.4.js"></script>
     <script type="text/javascript" src="https://cdn.datatables.net/1.10.15/js/jquery.dataTables.min.js"></script>
     
     <!--Semantic --> 
-    
     <script type="text/javascript" src="https://cdn.datatables.net/1.10.15/js/dataTables.semanticui.min.js"></script>
     <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/semantic-ui/2.2.6/semantic.min.js"></script> 
-   
     
     <!--Bootstrap  -->
 	<!-- <script src="https://cdn.datatables.net/1.10.15/js/jquery.dataTables.min.js"></script>
@@ -61,11 +61,64 @@
     <script type="text/javascript">
 	    $(document).ready(function() {
 	    	
-	        var table = $('#example').DataTable( {
+	    	//TODO: initialization data for passing to server!
+	    	var filter = function filterData(){
+	            var settings = $("#example").dataTable().fnSettings();
+	            console.log('datatable_settings: ', settings);
+	            
+	            //TODO: find sorted column
+	            console.log(settings.aLastSort[0]);
+	            var sort = {
+	            	col: settings.aLastSort[0].col,
+	            	dir: settings.aLastSort[0].dir,
+	            	colName: null
+	            };
+	            settings.aoColumns.forEach(function(column, index){
+	            	if(sort.col == index) sort.colName = column.mData;
+	            });
+	            
+	            //TODO: prepare data for passing to server!
+	            var obj = {
+	                "draw" : settings.iDraw,
+	                "page" : (settings._iDisplayStart / settings._iDisplayLength) + 1,
+	                "limit": settings._iDisplayLength,
+	                "firstname" : settings.oPreviousSearch.sSearch
+	            };
+	            console.log('filter', obj);
+	            return obj;
+	        };
+	        
+	        //TODO: advance datatable initialization
+	        var table = $('#example').DataTable({
 	            "processing": true,
 	            "serverSide": true,
+	            //TODO: 
+	            "lengthMenu": [[5, 10, 25, 50, -1], [5, 10, 25, 50, "All"]],
+	            //TODO:
 	            "pagingType": "full_numbers",
-	            "ajax": "http://localhost:8080/ajax/datatable",
+	            //TODO: 
+	            stateSave: true,
+	            //TODO: 
+	            "ajax":{
+	            	"url" : "/api/employees",
+	            	//TODO: Custom parameter sent to server!
+	            	"data": filter,
+	            	//TODO: Custom return parameter from server!
+	            	"dataFilter": function(response){
+	     	            var response = jQuery.parseJSON(response);
+	     	            console.log(response);
+	     	            
+	     	            //TODO: response pattern for DATATABLE
+	     	            var jsonDatatable = {
+	     	            	"draw" : response.paging.draw,
+	     	            	"recordsTotal": response.paging.recordsTotal,
+	     	            	"recordsFiltered": response.paging.recordsFiltered,
+	     	            	"data": response.data
+	     	            };
+	     	            return JSON.stringify(jsonDatatable); // return JSON string
+	     	        }
+	            },
+	            //TODO: 
 	            "columns": [
      		            { "data": "firstname" },
      		            { "data": "lastname" },
@@ -73,7 +126,9 @@
      		            { "data": "office" },
      		            { "data": "date" },
      		            { "data": "salary" }
-     		    ],
+     		    ]
+	        	/* ,
+	        	//TODO: Combobox Search
      		    "initComplete": function () {
      		            this.api().columns().every( function () {
      		                var column = this;
@@ -91,11 +146,11 @@
      		                } );
      		            } );
      		            $('.ui.dropdown').dropdown();
-     		        }
-	        } );
+     		      } */ 
+	        });
+	    
 	        
-	        /*
-	        //TODO: Search Block
+	        //TODO: TextBox Search
 	    	// Setup - add a text input to each footer cell
 	        $('#example tfoot th').each( function () {
 	            var title = $(this).text();
@@ -112,7 +167,8 @@
 	            } );
 	        } );
 	   	  	//TODO: End Search Block
-	   	  	*/
+	   	  	
+	        
 	    } );
     </script>
 
